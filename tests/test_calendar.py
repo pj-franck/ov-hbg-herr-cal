@@ -31,7 +31,7 @@ class CalendarTests(unittest.TestCase):
         self.assertIn("DTSTART;TZID=Europe/Stockholm:20260922T190000", calendar)
         self.assertIn("DTEND;TZID=Europe/Stockholm:20260922T210000", calendar)
         self.assertIn("SUMMARY:🤾 OV Helsingborg – IF Hallby HK", calendar)
-        self.assertIn("LOCATION:Helsingborg Arena", calendar)
+        self.assertIn("LOCATION:Idrottens Hus Helsingborg", calendar)
         self.assertIn("UID:12345@ov-hbg-herr-cal", calendar)
         self.assertIn("DTSTAMP:20260808T100000Z", calendar)
         self.assertTrue(calendar.endswith("END:VCALENDAR\r\n"))
@@ -41,6 +41,13 @@ class CalendarTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             render_calendar([CompetitionMatch(HANDBOLLSLIGAN, match)])
+
+    def test_uses_helsingborg_arena_when_the_source_has_no_venue(self) -> None:
+        match = Match("2", "22 sep 2026", "19:00", "OV Helsingborg HK", "IF Hallby HK", None, "https://example.test")
+
+        calendar = render_calendar([CompetitionMatch(HANDBOLLSLIGAN, match)])
+
+        self.assertIn("LOCATION:Helsingborg Arena", calendar)
 
 
 if __name__ == "__main__":
