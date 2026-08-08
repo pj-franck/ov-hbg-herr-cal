@@ -9,9 +9,12 @@ senare steg.
 
 ## Status
 
-Steg 2 är klart: hämtaren kan läsa alla 26 matcher i Handbollsligan herr för
-säsongen 2026/27 från förbundets officiella Profixio-sida. Den filtrerar ännu
-inte på hemmamatcher eller genererar någon kalenderfil.
+Steg 3 är klart: projektet väljer OV Helsingborg herrs hemmamatcher i
+Handbollsligan och Svenska Cupen. Kalenderfilen genereras i ett senare steg.
+
+Handbollsligans fullständiga 2026/27-schema är anslutet. Svenska Cupen är
+förberedd som godkänd tävling och kopplas in när förbundet publicerar OV:s
+herrschema för cupens senare omgångar.
 
 ## Utveckling
 
