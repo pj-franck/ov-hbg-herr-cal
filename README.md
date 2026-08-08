@@ -9,8 +9,9 @@ senare steg.
 
 ## Status
 
-Steg 3 är klart: projektet väljer OV Helsingborg herrs hemmamatcher i
-Handbollsligan och Svenska Cupen. Kalenderfilen genereras i ett senare steg.
+Steg 4 är klart: de valda hemmamatcherna kan genereras som en `.ics`-kalender
+med tidszonen Europe/Stockholm, två timmars matchlängd och Helsingborg Arena
+som plats.
 
 Handbollsligans fullständiga 2026/27-schema är anslutet. Svenska Cupen är
 förberedd som godkänd tävling och kopplas in när förbundet publicerar OV:s
