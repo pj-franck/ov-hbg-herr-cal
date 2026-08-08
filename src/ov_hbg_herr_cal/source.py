@@ -15,7 +15,7 @@ from urllib.request import HTTPCookieProcessor, Request, build_opener
 DEFAULT_TIMEOUT_SECONDS = 30
 MAX_LOAD_MORE_REQUESTS = 10
 DEFAULT_LEAGUE_SCHEDULE_URL = (
-    "https://www.profixio.com/app/lx/competition/leagueid17951/teams/1398784"
+    "https://www.profixio.com/app/lx/competition/leagueid28137/teams/1584193"
 )
 
 
