@@ -42,12 +42,12 @@ class CalendarTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             render_calendar([CompetitionMatch(HANDBOLLSLIGAN, match)])
 
-    def test_uses_helsingborg_arena_when_the_source_has_no_venue(self) -> None:
+    def test_omits_location_when_the_source_has_no_venue(self) -> None:
         match = Match("2", "22 sep 2026", "19:00", "OV Helsingborg HK", "IF Hallby HK", None, "https://example.test")
 
         calendar = render_calendar([CompetitionMatch(HANDBOLLSLIGAN, match)])
 
-        self.assertIn("LOCATION:Helsingborg Arena", calendar)
+        self.assertNotIn("LOCATION:", calendar)
 
 
 if __name__ == "__main__":
