@@ -9,7 +9,7 @@ from .filtering import CompetitionMatch, OV_HELSINGBORG_HK
 
 CALENDAR_NAME = "OV Helsingborg Herr – Hemmamatcher"
 CALENDAR_TIMEZONE = "Europe/Stockholm"
-HOME_VENUE = "Helsingborg Arena"
+DEFAULT_HOME_VENUE = "Helsingborg Arena"
 MATCH_DURATION = timedelta(hours=2)
 _SWEDISH_MONTHS = {
     "jan": 1,
@@ -57,7 +57,7 @@ def render_calendar(
                 f"DTSTART;TZID={CALENDAR_TIMEZONE}:{start.strftime('%Y%m%dT%H%M%S')}",
                 f"DTEND;TZID={CALENDAR_TIMEZONE}:{end.strftime('%Y%m%dT%H%M%S')}",
                 f"SUMMARY:{_escape(f'🤾 OV Helsingborg – {opponent}')}",
-                f"LOCATION:{_escape(HOME_VENUE)}",
+                f"LOCATION:{_escape(match.venue or DEFAULT_HOME_VENUE)}",
                 f"DESCRIPTION:{_escape(competition_match.competition)}",
                 f"URL:{_escape(match.source_url)}",
                 "END:VEVENT",
