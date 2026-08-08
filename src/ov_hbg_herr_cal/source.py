@@ -34,6 +34,7 @@ class Match:
     away_team: str
     venue: str | None
     source_url: str
+    notes: str | None = None
 
 
 class _ScheduleParser(HTMLParser):
