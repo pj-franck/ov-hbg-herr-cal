@@ -17,9 +17,6 @@ permissions:
   pages: write
   id-token: write
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -36,9 +33,22 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Skapa kalenderfil
         run: PYTHONPATH=src python -m ov_hbg_herr_cal.generate --output site/ov-hemmamatcher.ics
-      - uses: actions/upload-pages-artifact@v4
+      - name: Paketera Pages-artifakt
+        run: |
+          tar \
+            --dereference --hard-dereference \
+            --directory site \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            .
+      - name: Ladda upp Pages-artifakt
+        uses: actions/upload-artifact@v6
         with:
-          path: site
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
+          if-no-files-found: error
 
   deploy:
     needs: build
