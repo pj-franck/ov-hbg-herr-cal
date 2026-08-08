@@ -1,1 +1,1 @@
-# Python dependencies will be added when calendar functionality is implemented.
+# Steg 2 använder bara Python-standardbiblioteket.
