@@ -9,9 +9,9 @@ senare steg.
 
 ## Status
 
-Steg 2 är klart: hämtaren kan läsa alla matcher från en angiven officiell
-Profixio-länk. Den filtrerar ännu inte på herrlag, hemmamatcher eller tävling
-och genererar ingen kalenderfil.
+Steg 2 är klart: hämtaren kan läsa alla 26 matcher i Handbollsligan herr för
+säsongen 2026/27 från förbundets officiella Profixio-sida. Den filtrerar ännu
+inte på hemmamatcher eller genererar någon kalenderfil.
 
 ## Utveckling
 
