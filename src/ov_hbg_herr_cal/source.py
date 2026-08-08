@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from html import unescape
 from html.parser import HTMLParser
 import json
@@ -15,7 +16,7 @@ from urllib.request import HTTPCookieProcessor, Request, build_opener
 DEFAULT_TIMEOUT_SECONDS = 30
 MAX_LOAD_MORE_REQUESTS = 10
 DEFAULT_LEAGUE_SCHEDULE_URL = (
-    "https://www.profixio.com/app/lx/competition/leagueid28137/teams/1584193"
+    "https://www.profixio.com/app/leagueid28137/teams/1584193"
 )
 
 
@@ -47,6 +48,7 @@ class _ScheduleParser(HTMLParser):
         self._match: dict[str, object] | None = None
         self._li_depth = 0
         self._anchor: tuple[str, str] | None = None
+        self._capture: tuple[str, int, str] | None = None
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attributes = dict(attrs)
@@ -55,10 +57,21 @@ class _ScheduleParser(HTMLParser):
             self._li_depth = 1
             return
         if self._match is not None:
+            if self._capture is not None and tag == "div":
+                kind, depth, captured_text = self._capture
+                self._capture = (kind, depth + 1, captured_text)
             if tag == "li":
                 self._li_depth += 1
             if tag == "a":
                 self._anchor = (attributes.get("href", ""), "")
+            if tag == "div":
+                classes = attributes.get("class", "")
+                if "leading-5" in classes:
+                    self._capture = ("team", 1, "")
+                elif "text-xs" in classes and "text-right" in classes:
+                    self._capture = ("venue", 1, "")
+            if timestamp := re.search(r"timestamp:\s*(\d+)", attributes.get("x-data", "")):
+                self._match["timestamp"] = timestamp.group(1)
 
     def handle_endtag(self, tag: str) -> None:
         if self._match is None:
@@ -71,6 +84,18 @@ class _ScheduleParser(HTMLParser):
             elif "/facility/" in href and label:
                 self._match["venue"] = label
             self._anchor = None
+        if tag == "div" and self._capture is not None:
+            kind, depth, captured_text = self._capture
+            if depth == 1:
+                captured_text = " ".join(captured_text.split())
+                if captured_text:
+                    if kind == "team":
+                        self._match["teams"].append(captured_text)  # type: ignore[union-attr]
+                    else:
+                        self._match["venue"] = captured_text
+                self._capture = None
+            else:
+                self._capture = (kind, depth - 1, captured_text)
         if tag == "li":
             self._li_depth -= 1
             if self._li_depth == 0:
@@ -80,7 +105,10 @@ class _ScheduleParser(HTMLParser):
     def handle_data(self, data: str) -> None:
         if self._match is None:
             return
-        self._match["text"].append(data)  # type: ignore[union-attr]
+        self._match["text"].append(data)  # type: ignore[arg-type]
+        if self._capture is not None:
+            kind, depth, captured_text = self._capture
+            self._capture = (kind, depth, captured_text + data)
         if self._anchor is not None:
             href, label = self._anchor
             self._anchor = (href, label + data)
@@ -88,15 +116,28 @@ class _ScheduleParser(HTMLParser):
     def _finish_match(self) -> None:
         assert self._match is not None
         text = " ".join(" ".join(self._match["text"]).split())  # type: ignore[arg-type]
-        date_match = re.search(r"\b\d{1,2}\s+(?:jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec)\s+\d{4}\b", text, re.I)
+        date_match = re.search(
+            r"\b(\d{1,2})\s+(jan|feb|mar|apr|maj|jun|jul|aug|sep|okt|nov|dec)(?:\s+(\d{4}))?\b",
+            text,
+            re.I,
+        )
         teams: list[str] = self._match["teams"]  # type: ignore[assignment]
         if date_match is None or len(teams) < 2:
+            return
+        if date_match.group(3):
+            date = date_match.group(0)
+        elif timestamp := self._match.get("timestamp"):
+            # The timestamp is only used for the season year. The visible
+            # Swedish date and time remain the source of truth for the event.
+            match_time = datetime.utcfromtimestamp(int(timestamp))
+            date = f"{date_match.group(1)} {date_match.group(2).lower()} {match_time.year}"
+        else:
             return
         time_match = re.search(r"\b\d{1,2}:\d{2}\b", text)
         self.matches.append(
             Match(
                 match_id=str(self._match["id"]),
-                date=date_match.group(0),
+                date=date,
                 time=time_match.group(0) if time_match else None,
                 home_team=teams[0],
                 away_team=teams[1],
@@ -138,7 +179,13 @@ class ProfixioSource:
         opener = build_opener(HTTPCookieProcessor(CookieJar()))
         initial_url = self._all_matches_url()
         html = self._get(opener, initial_url)
-        previous_count = len(parse_matches(html, self.schedule_url))
+        initial_matches = parse_matches(html, self.schedule_url)
+        if initial_matches:
+            return initial_matches
+
+        # Older Profixio pages load the remaining schedule through Livewire.
+        # Keep this compatibility path for a future source URL that still uses it.
+        previous_count = 0
         snapshot, csrf_token = _livewire_metadata(html)
 
         for _ in range(MAX_LOAD_MORE_REQUESTS):
@@ -147,7 +194,9 @@ class ProfixioSource:
             rendered_html = component["effects"].get("html", "")
             matches = parse_matches(rendered_html, self.schedule_url)
             if len(matches) <= previous_count:
-                return matches
+                if matches:
+                    return matches
+                raise SourceError("Profixio returnerade inga matcher. Kalendern uppdaterades inte.")
             previous_count = len(matches)
             snapshot = component["snapshot"]
 
