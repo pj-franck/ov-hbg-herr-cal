@@ -9,14 +9,14 @@ officiella matchdata.
 
 ## Prenumerera
 
-Öppna [kalendersidan](https://pj-franck.github.io/ov-hbg-herr-cal/) och välj
+Öppna [kalendersidan](https://pj-franck.github.io/ov-hbg-herr-cal) och välj
 **Prenumerera via WebCal**, eller använd länken direkt:
 
 ```text
-webcal://pj-franck.github.io/ov-hbg-herr-cal/ov-hemmamatcher.ics
+webcal://pjf.se/ov-herr.ics
 ```
 
-Du kan också [hämta kalenderfilen (.ics)](https://pj-franck.github.io/ov-hbg-herr-cal/ov-hemmamatcher.ics).
+Du kan också [hämta kalenderfilen (.ics)](https://pjf.se/ov-herr.ics).
 
 ## Vad ingår?
 
