@@ -16,7 +16,7 @@ from urllib.request import HTTPCookieProcessor, Request, build_opener
 DEFAULT_TIMEOUT_SECONDS = 30
 MAX_LOAD_MORE_REQUESTS = 10
 DEFAULT_LEAGUE_SCHEDULE_URL = (
-    "https://www.profixio.com/app/leagueid28137/teams/1584193"
+    "https://www.profixio.com/app/leagueid28137/teams/1584193?k=1182222"
 )
 
 
@@ -207,7 +207,13 @@ class ProfixioSource:
         return f"{self.schedule_url}{separator}t=schedule&f=all"
 
     def _get(self, opener: object, url: str) -> str:
-        request = Request(url, headers={"User-Agent": "ov-hbg-herr-cal/0.1"})
+        request = Request(
+            url,
+            headers={
+                "Accept-Language": "sv-SE,sv;q=0.9,en;q=0.8",
+                "User-Agent": "Mozilla/5.0 (compatible; ov-hbg-herr-cal/1.0)",
+            },
+        )
         try:
             with opener.open(request, timeout=self.timeout_seconds) as response:  # type: ignore[union-attr]
                 return response.read().decode("utf-8")
