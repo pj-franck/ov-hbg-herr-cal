@@ -1,0 +1,48 @@
+name: Publicera OV Helsingborg-kalendern
+
+on:
+  schedule:
+    - cron: "15 2 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "site/**"
+      - "tests/**"
+      - ".github/workflows/publish-calendar.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Kör tester
+        run: python -m unittest discover -s tests -v
+      - name: Skapa kalenderfil
+        run: PYTHONPATH=src python -m ov_hbg_herr_cal.generate --output site/ov-hemmamatcher.ics
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
