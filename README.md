@@ -17,6 +17,15 @@ Handbollsligans fullständiga 2026/27-schema är anslutet. Svenska Cupen är
 förberedd som godkänd tävling och kopplas in när förbundet publicerar OV:s
 herrschema för cupens senare omgångar.
 
+## Kalenderprenumeration
+
+GitHub Actions uppdaterar kalendern varje natt och publicerar den på GitHub
+Pages. När Pages har aktiverats i repots inställningar används denna länk:
+
+```text
+webcal://pj-franck.github.io/ov-hbg-herr-cal/ov-hemmamatcher.ics
+```
+
 ## Utveckling
 
 Projektet kräver Python 3.11 eller senare och har inga externa beroenden.
