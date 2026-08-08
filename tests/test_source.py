@@ -34,6 +34,18 @@ class ParseMatchesTests(unittest.TestCase):
 
         self.assertEqual(_livewire_metadata(html), ('{"id":1}', "token"))
 
+    def test_parses_the_2026_27_profixio_card_layout(self) -> None:
+        fixture = Path(__file__).parent / "fixtures" / "profixio_schedule_2026_27.html"
+        matches = parse_matches(fixture.read_text(encoding="utf-8"), "https://example.test/schedule")
+
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0].match_id, "32643000")
+        self.assertEqual(matches[0].date, "5 mar 2027")
+        self.assertEqual(matches[0].time, "19:00")
+        self.assertEqual(matches[0].home_team, "OV Helsingborg HK")
+        self.assertEqual(matches[0].away_team, "Hammarby IF HF")
+        self.assertEqual(matches[0].venue, "Idrottens Hus Helsingborg")
+
     def test_defaults_to_the_2026_27_league_schedule(self) -> None:
         self.assertIn("leagueid28137", DEFAULT_LEAGUE_SCHEDULE_URL)
         self.assertIn("teams/1584193", DEFAULT_LEAGUE_SCHEDULE_URL)
