@@ -32,6 +32,7 @@ class CalendarTests(unittest.TestCase):
         self.assertIn("DTEND;TZID=Europe/Stockholm:20260922T210000", calendar)
         self.assertIn("SUMMARY:🤾 OV Helsingborg – IF Hallby HK", calendar)
         self.assertIn("LOCATION:Idrottens Hus Helsingborg", calendar)
+        self.assertIn("DESCRIPTION:\r\n", calendar)
         self.assertIn("UID:12345@ov-hbg-herr-cal", calendar)
         self.assertIn("DTSTAMP:20260808T100000Z", calendar)
         self.assertTrue(calendar.endswith("END:VCALENDAR\r\n"))
@@ -48,6 +49,22 @@ class CalendarTests(unittest.TestCase):
         calendar = render_calendar([CompetitionMatch(HANDBOLLSLIGAN, match)])
 
         self.assertNotIn("LOCATION:", calendar)
+
+    def test_uses_match_information_as_notes(self) -> None:
+        match = Match(
+            "3",
+            "22 sep 2026",
+            "19:00",
+            "OV Helsingborg HK",
+            "IF Hallby HK",
+            "Helsingborg Arena",
+            "https://example.test",
+            "Entrén öppnar 18:00",
+        )
+
+        calendar = render_calendar([CompetitionMatch(HANDBOLLSLIGAN, match)])
+
+        self.assertIn("DESCRIPTION:Entrén öppnar 18:00", calendar)
 
 
 if __name__ == "__main__":
