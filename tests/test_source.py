@@ -4,7 +4,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
-from ov_hbg_herr_cal.source import _livewire_metadata, parse_matches
+from ov_hbg_herr_cal.source import DEFAULT_LEAGUE_SCHEDULE_URL, _livewire_metadata, parse_matches
 
 
 class ParseMatchesTests(unittest.TestCase):
@@ -27,6 +27,10 @@ class ParseMatchesTests(unittest.TestCase):
         html = '<div wire:key="x-schedule-0" wire:snapshot="{&quot;id&quot;:1}"></div><script data-csrf="token"></script>'
 
         self.assertEqual(_livewire_metadata(html), ('{"id":1}', "token"))
+
+    def test_defaults_to_the_2026_27_league_schedule(self) -> None:
+        self.assertIn("leagueid28137", DEFAULT_LEAGUE_SCHEDULE_URL)
+        self.assertIn("teams/1584193", DEFAULT_LEAGUE_SCHEDULE_URL)
 
 
 if __name__ == "__main__":
