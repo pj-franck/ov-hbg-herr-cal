@@ -62,7 +62,7 @@ def render_calendar(
             lines.append(f"LOCATION:{_escape(match.venue)}")
         lines.extend(
             [
-                f"DESCRIPTION:{_escape(competition_match.competition)}",
+                f"DESCRIPTION:{_escape(match.notes or '')}",
                 f"URL:{_escape(match.source_url)}",
                 "END:VEVENT",
             ]
